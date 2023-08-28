@@ -1,9 +1,9 @@
 const lookBtn = document.querySelector('.transfer__btn');
-const nameBtn = document.querySelector('.name__btn');
-const nationBtn = document.querySelector('.nation__btn');
-const ageBtn = document.querySelector('.age__btn');
-const positionBtn = document.querySelector('.position__btn');
-const imgBtn = document.querySelector('.img__btn');
+const nameInput = document.getElementById('name__input');
+const nationInput = document.getElementById('nation__input');
+const ageInput = document.getElementById('age__input');
+const positionInput = document.getElementById('position__input');
+const imgInput = document.getElementById('img__input');
 const uploadBtn = document.querySelector('.upload__btn');
 
 const LookPlayer = () => {
@@ -48,13 +48,13 @@ const Upload = () =>{
                     'image' : url
                 };
                 db.collection('Player').add(saveInfo)
-                .then((result)=>{
-                    alert('업로드 완료');
-                    window.location.href="PlayerList.html";
-                })
-                .catch((error)=>{
-                    alert('업로드 실패');
-                });
+                    .then((result)=>{
+                        alert('업로드 완료');
+                        window.location.href="playerList.html";
+                    })
+                    .catch((error)=>{
+                        alert('업로드 실패');
+                    });
             });
           }
         )

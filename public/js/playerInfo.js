@@ -2,7 +2,7 @@ const selectedPlayerData = JSON.parse(localStorage.getItem('selectedPlayer'));
 const viewPlayer = (selectedPlayerData) => {
    const profilePage = document.createElement("section");
    profilePage.classList.add("player__profile");
-   profilePage.innerHTML = `
+   profilePage.innerHTML = /*html*/`
       <div class="profile__container">
             <div class="player__image">
                <img src="${selectedPlayerData.image}" alt="동적 생성 예정 이미지">
@@ -22,12 +22,12 @@ const viewPlayer = (selectedPlayerData) => {
                         <h2>국적</h2>
                         <h2>나이</h2>
                         <h2>포지션</h2>
-                        
                     </div>
+
                     <div class="sub__value">
-                    <h2>${selectedPlayerData.Nation}</h2>
-                    <h2>${selectedPlayerData.Age}</h2>
-                    <h2>${selectedPlayerData.position}</h2>
+                        <h2>${selectedPlayerData.Nation}</h2>
+                        <h2>${selectedPlayerData.Age}</h2>
+                        <h2>${selectedPlayerData.position}</h2>
                     </div>
                 </div>
                 <div class="save__profile">
@@ -42,31 +42,30 @@ const viewPlayer = (selectedPlayerData) => {
 viewPlayer(selectedPlayerData);
 
 window.onload = function(){
-    const updateBtn = document.querySelector('.update__info .update__btn');
+    const updateBtn = document.querySelector('.update__btn');
     const openModal = document.querySelector('.update__modal');
     const saveModalBtn = document.querySelector('.save__btn-modal');
+
     updateBtn.addEventListener('click',()=>{
         openModal.style.display="block";
         document.body.style.overflow= "hidden";
-
-        document.querySelector('#new-Name').value = selectedPlayerData.Name;
-        document.querySelector('#new-Nation').value = selectedPlayerData.Nation;
-        document.querySelector('#new-Age').value = selectedPlayerData.Age;
-        document.querySelector('#new-Position').value = selectedPlayerData.position;
-
+        document.getElementById('new-Name').value = selectedPlayerData.Name;
+        document.getElementById('new-Nation').value = selectedPlayerData.Nation;
+        document.getElementById('new-Age').value = selectedPlayerData.Age;
+        document.getElementById('new-Position').value = selectedPlayerData.position;
     });
-   const  closeModal = () =>{
+
+   const closeModal = () =>{
         openModal.style.display= "none";
         document.body.style.overflow = "auto";
     }
     
     window.addEventListener('click',(event)=>{
         if(event.target===openModal){
-            openModal.style.display= "none";
-            document.body.style.overflow = "auto";
-            console.log('click');
+            closeModal();
         }
     })
+
     const updatePage = (updatedData) =>{
         const updateName = document.querySelector('.main__title h2');
         const updateNation = document.querySelector('.sub__value h2:nth-child(1)')
@@ -78,6 +77,7 @@ window.onload = function(){
         updateNation.textContent = updatedData.Nation;
         updateAge.textContent = updatedData.Age;
         updatePosition.textContent = updatedData.position;
+
         if(updateImage){
             updateImage.src = updatedData.image;
         }
@@ -91,58 +91,57 @@ window.onload = function(){
         const newImage = document.querySelector('#new-Image').files[0];
 
        const updatedData = {
-        ...selectedPlayerData,
-        Name: newName !== "" ? newName: selectedPlayerData.Name,
-        Nation: newNation !== "" ? newNation : selectedPlayerData.Nation,
-        Age: newAge !== "" ? newAge : selectedPlayerData.Age,
-        position: newPosition !== "" ? newPosition : selectedPlayerData.position
-       }
+            ...selectedPlayerData,
+            Name: newName !== "" ? newName: selectedPlayerData.Name,
+            Nation: newNation !== "" ? newNation : selectedPlayerData.Nation,
+            Age: newAge !== "" ? newAge : selectedPlayerData.Age,
+            position: newPosition !== "" ? newPosition : selectedPlayerData.position
+            }
        /* firebase 데이터 반영 */ 
        selectedPlayerId = selectedPlayerData.id;
        const db = firebase.firestore();
        const storage = firebase.storage();
 
        if(newImage){
-        let storageRef = storage.ref();
-        let storagePath = storageRef.child('image/'+ newImage.name);
-        let updateWork = storagePath.put(newImage)
-
-        updateWork.on('state_changed',
-         null,
-         (error)=>{
-            console.error('Error : ', error);
-         },
-         ()=>{
-            updateWork.snapshot.ref.getDownloadURL().then((updateUrl)=>{
-                updatedData.image = updateUrl;
-                   db.collection('Player').doc(selectedPlayerId).update(updatedData)
-                   .then(()=>{
-                      updatePage(updatedData);
-                      closeModal();
-                      alert('선수 정보 수정이 완료됐습니다.');
-                      console.log('업데이트 완료');
-                   })
-                   .catch((error)=>{
-                      alert('선수 정보 수정을 실패했습니다.')
-                      console.error('선수 정보 수정 실패', error);
-                   });
-                localStorage.setItem('selectedPlayer',JSON.stringify(updatedData));
-            });
-         }
-        )
-
+           let storageRef = storage.ref();
+           let storagePath = storageRef.child('image/'+ newImage.name);
+           let updateWork = storagePath.put(newImage)
+ 
+           updateWork.on('state_changed',
+            null,
+            (error)=>{
+               console.error('Error : ', error);
+            },
+            ()=>{
+               updateWork.snapshot.ref.getDownloadURL().then((updateUrl)=>{
+                   updatedData.image = updateUrl;
+                      db.collection('Player').doc(selectedPlayerId).update(updatedData)
+                         .then(()=>{
+                            updatePage(updatedData);
+                            closeModal();
+                            alert('선수 정보 수정이 완료됐습니다.');
+                            console.log('업데이트 완료');
+                         })
+                         .catch((error)=>{
+                            alert('선수 정보 수정을 실패했습니다.')
+                            console.error('선수 정보 수정 실패', error);
+                         });
+                      localStorage.setItem('selectedPlayer',JSON.stringify(updatedData));
+               });
+            }
+           )
+  
        }else{
         db.collection('Player').doc(selectedPlayerId).update(updatedData)
              .then(()=>{
-                
                 updatePage(updatedData);
                 closeModal();
                 alert('선수 정보 수정이 완료됐습니다.');
                 console.log('업데이트 완료');
              })
-             .catch((error)=>{
-                alert('선수 정보 수정을 실패했습니다.')
-                console.error('선수 정보 수정 실패', error);
+              .catch((error)=>{
+                 alert('선수 정보 수정을 실패했습니다.')
+                 console.error('선수 정보 수정 실패', error);
              });
         
         localStorage.setItem('selectedPlayer',JSON.stringify(updatedData));
@@ -153,10 +152,12 @@ window.onload = function(){
        }
     const SavePage = ()=>{
         const saveBtn = document.querySelector('.save__btn');
+
         saveBtn.addEventListener('click',()=>{
             window.location.href="playerList.html";
            })
     }
+
     saveModalBtn.addEventListener('click',saveModal)
     SavePage();
 };
